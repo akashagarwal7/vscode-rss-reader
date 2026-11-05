@@ -1,0 +1,400 @@
+{
+  "name": "rss-feed-curator",
+  "displayName": "RSS Feed Curator",
+  "description": "Curate global and per-project RSS/Atom feeds, get notified in VS Code/Cursor and macOS when new posts land, and track read/unread across every window.",
+  "version": "0.1.0",
+  "publisher": "akashagarwal",
+  "author": {
+    "name": "Akash Agarwal",
+    "email": "agarwal.akash333@gmail.com"
+  },
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#2b1d0e",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/akashagarwal7/vscode-rss-reader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akashagarwal7/vscode-rss-reader/issues"
+  },
+  "homepage": "https://github.com/akashagarwal7/vscode-rss-reader#readme",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "rss",
+    "atom",
+    "feed",
+    "reader",
+    "news",
+    "notifications",
+    "json feed",
+    "cursor"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rssCurator",
+          "title": "RSS Feeds",
+          "icon": "media/rss.svg"
+        }
+      ]
+    },
+    "views": {
+      "rssCurator": [
+        {
+          "id": "rssCurator.feeds",
+          "name": "Feeds",
+          "icon": "media/rss.svg",
+          "contextualTitle": "RSS Feeds"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "rssCurator.feeds",
+        "when": "!rssCurator.hasFeeds",
+        "contents": "No feeds yet.\n[Add Feed](command:rssCurator.addFeed)\nOr edit the sources files directly:\n[Edit Global Feeds](command:rssCurator.openGlobalFeeds)\n[Edit Project Feeds](command:rssCurator.openProjectFeeds)\nGlobal feeds apply to every window; project feeds live in .vscode/rss-feeds.json."
+      }
+    ],
+    "commands": [
+      {
+        "command": "rssCurator.refresh",
+        "title": "Refresh All Feeds",
+        "category": "RSS Feed Curator",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "rssCurator.refreshFeed",
+        "title": "Refresh Feed",
+        "category": "RSS Feed Curator",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "rssCurator.addFeed",
+        "title": "Add Feed…",
+        "category": "RSS Feed Curator",
+        "icon": "$(add)"
+      },
+      {
+        "command": "rssCurator.removeFeed",
+        "title": "Remove Feed",
+        "category": "RSS Feed Curator",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "rssCurator.openGlobalFeeds",
+        "title": "Edit Global Feeds",
+        "category": "RSS Feed Curator",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "rssCurator.openProjectFeeds",
+        "title": "Edit Project Feeds",
+        "category": "RSS Feed Curator",
+        "icon": "$(root-folder)"
+      },
+      {
+        "command": "rssCurator.openItem",
+        "title": "Open Post",
+        "category": "RSS Feed Curator",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "rssCurator.markRead",
+        "title": "Mark as Read",
+        "category": "RSS Feed Curator",
+        "icon": "$(check)"
+      },
+      {
+        "command": "rssCurator.markUnread",
+        "title": "Mark as Unread",
+        "category": "RSS Feed Curator",
+        "icon": "$(circle-filled)"
+      },
+      {
+        "command": "rssCurator.markFeedRead",
+        "title": "Mark Feed as Read",
+        "category": "RSS Feed Curator",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "rssCurator.markAllRead",
+        "title": "Mark All as Read",
+        "category": "RSS Feed Curator",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "rssCurator.copyLink",
+        "title": "Copy Link",
+        "category": "RSS Feed Curator"
+      },
+      {
+        "command": "rssCurator.openFeedSite",
+        "title": "Open Website",
+        "category": "RSS Feed Curator",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "rssCurator.showUnreadOnly",
+        "title": "Show Only Unread",
+        "category": "RSS Feed Curator",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "rssCurator.showAll",
+        "title": "Show All Posts",
+        "category": "RSS Feed Curator",
+        "icon": "$(filter-filled)"
+      },
+      {
+        "command": "rssCurator.nextUnread",
+        "title": "Open Next Unread Post",
+        "category": "RSS Feed Curator",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "rssCurator.showLog",
+        "title": "Show Log",
+        "category": "RSS Feed Curator",
+        "icon": "$(output)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "rssCurator.addFeed",
+          "when": "view == rssCurator.feeds",
+          "group": "navigation@1"
+        },
+        {
+          "command": "rssCurator.refresh",
+          "when": "view == rssCurator.feeds",
+          "group": "navigation@2"
+        },
+        {
+          "command": "rssCurator.showUnreadOnly",
+          "when": "view == rssCurator.feeds && !rssCurator.unreadOnly",
+          "group": "navigation@3"
+        },
+        {
+          "command": "rssCurator.showAll",
+          "when": "view == rssCurator.feeds && rssCurator.unreadOnly",
+          "group": "navigation@3"
+        },
+        {
+          "command": "rssCurator.markAllRead",
+          "when": "view == rssCurator.feeds",
+          "group": "navigation@4"
+        },
+        {
+          "command": "rssCurator.openGlobalFeeds",
+          "when": "view == rssCurator.feeds",
+          "group": "2_sources@1"
+        },
+        {
+          "command": "rssCurator.openProjectFeeds",
+          "when": "view == rssCurator.feeds",
+          "group": "2_sources@2"
+        },
+        {
+          "command": "rssCurator.nextUnread",
+          "when": "view == rssCurator.feeds",
+          "group": "3_misc@1"
+        },
+        {
+          "command": "rssCurator.showLog",
+          "when": "view == rssCurator.feeds",
+          "group": "3_misc@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "rssCurator.markRead",
+          "when": "view == rssCurator.feeds && viewItem == item-unread",
+          "group": "inline@1"
+        },
+        {
+          "command": "rssCurator.markUnread",
+          "when": "view == rssCurator.feeds && viewItem == item-read",
+          "group": "inline@1"
+        },
+        {
+          "command": "rssCurator.markFeedRead",
+          "when": "view == rssCurator.feeds && viewItem =~ /^feed-/",
+          "group": "inline@1"
+        },
+        {
+          "command": "rssCurator.openItem",
+          "when": "view == rssCurator.feeds && viewItem =~ /^item-/",
+          "group": "1_open@1"
+        },
+        {
+          "command": "rssCurator.copyLink",
+          "when": "view == rssCurator.feeds && viewItem =~ /^item-/",
+          "group": "1_open@2"
+        },
+        {
+          "command": "rssCurator.markRead",
+          "when": "view == rssCurator.feeds && viewItem == item-unread",
+          "group": "2_state@1"
+        },
+        {
+          "command": "rssCurator.markUnread",
+          "when": "view == rssCurator.feeds && viewItem == item-read",
+          "group": "2_state@1"
+        },
+        {
+          "command": "rssCurator.refreshFeed",
+          "when": "view == rssCurator.feeds && viewItem =~ /^feed-/",
+          "group": "1_feed@1"
+        },
+        {
+          "command": "rssCurator.openFeedSite",
+          "when": "view == rssCurator.feeds && viewItem =~ /^feed-/",
+          "group": "1_feed@2"
+        },
+        {
+          "command": "rssCurator.markFeedRead",
+          "when": "view == rssCurator.feeds && viewItem =~ /^feed-/",
+          "group": "2_state@1"
+        },
+        {
+          "command": "rssCurator.removeFeed",
+          "when": "view == rssCurator.feeds && viewItem =~ /^feed-/",
+          "group": "3_remove@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "rssCurator.openItem",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.markRead",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.markUnread",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.markFeedRead",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.copyLink",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.openFeedSite",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.refreshFeed",
+          "when": "false"
+        },
+        {
+          "command": "rssCurator.removeFeed",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "RSS Feed Curator",
+      "properties": {
+        "rssCurator.refreshIntervalMinutes": {
+          "type": "number",
+          "default": 120,
+          "minimum": 5,
+          "description": "How often each feed is fetched, in minutes. Fetching is coordinated across all open windows."
+        },
+        "rssCurator.notifications.editor": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show an in-editor notification when new posts arrive."
+        },
+        "rssCurator.notifications.system": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a system notification (macOS Notification Center / Linux notify-send) when new posts arrive. Install `terminal-notifier` (brew) to open the post when clicked."
+        },
+        "rssCurator.notifications.systemSound": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "macOS sound name for system notifications (e.g. `Glass`, `Ping`). Empty for silent."
+        },
+        "rssCurator.openIn": {
+          "type": "string",
+          "enum": [
+            "browser",
+            "editor"
+          ],
+          "enumDescriptions": [
+            "Default web browser",
+            "Simple Browser tab inside the editor"
+          ],
+          "default": "browser",
+          "description": "Where to open posts."
+        },
+        "rssCurator.maxItemsPerFeed": {
+          "type": "number",
+          "default": 200,
+          "minimum": 10,
+          "description": "Maximum posts kept per feed."
+        },
+        "rssCurator.statusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the unread count in the status bar."
+        },
+        "rssCurator.dataDirectory": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Where global feeds (`feeds.json`), the post cache and read state live. Defaults to `~/.rss-feed-curator`, shared by VS Code and Cursor."
+        }
+      }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": [
+          "**/.vscode/rss-feeds.json",
+          "**/.rss-feed-curator/feeds.json"
+        ],
+        "url": "./media/feeds.schema.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run check && node esbuild.mjs --production",
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "check": "tsc --noEmit -p .",
+    "test": "esbuild src/test/*.test.ts --bundle --platform=node --outdir=out/test --log-level=warning && node --test out/test/*.test.js",
+    "test:integration": "npm run build && esbuild src/test/integration/runTest.ts src/test/integration/suite.ts --bundle --platform=node --format=cjs --external:vscode --external:@vscode/test-electron --outdir=out/test/integration --log-level=warning && node out/test/integration/runTest.js",
+    "package": "npx --yes @vscode/vsce package",
+    "publish": "npx --yes @vscode/vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/vscode": "~1.90.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.28.2",
+    "fast-xml-parser": "^5.12.0",
+    "typescript": "^7.0.2"
+  }
+}

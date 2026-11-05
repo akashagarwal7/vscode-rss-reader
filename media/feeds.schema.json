@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RSS Feed Curator sources",
+  "type": "object",
+  "properties": {
+    "feeds": {
+      "type": "array",
+      "description": "Feeds to follow.",
+      "items": {
+        "anyOf": [
+          { "type": "string", "format": "uri", "description": "Feed URL" },
+          {
+            "type": "object",
+            "required": ["url"],
+            "properties": {
+              "url": { "type": "string", "format": "uri", "description": "RSS, Atom or JSON Feed URL" },
+              "name": { "type": "string", "description": "Display name (defaults to the feed's title)" }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": ["feeds"]
+}

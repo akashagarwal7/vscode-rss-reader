@@ -1,0 +1,10 @@
+**
+!dist/extension.js
+!dist/webview.js
+!dist/codicon.css
+!dist/codicon.ttf
+!media/**
+!package.json
+!README.md
+!CHANGELOG.md
+!LICENSE
