@@ -77,6 +77,16 @@ export class Controller implements vscode.Disposable {
       projectWatcher.onDidChange(onProject),
       projectWatcher.onDidCreate(onProject),
       projectWatcher.onDidDelete(onProject),
+      // File watchers can miss newly created folders (notably on Linux); saves/creates in the editor are reliable.
+      vscode.workspace.onDidSaveTextDocument((d) => {
+        if (this.isSourcesFile(d.uri)) this.scheduleReload(true);
+      }),
+      vscode.workspace.onDidCreateFiles((e) => {
+        if (e.files.some((u) => this.isSourcesFile(u))) this.scheduleReload(true);
+      }),
+      vscode.workspace.onDidDeleteFiles((e) => {
+        if (e.files.some((u) => this.isSourcesFile(u))) this.scheduleReload(true);
+      }),
       vscode.workspace.onDidChangeWorkspaceFolders(() => this.reloadSources().then(() => this.tick())),
       vscode.workspace.onDidChangeConfiguration(async (e) => {
         if (e.affectsConfiguration(`${SECTION}.dataDirectory`)) {
@@ -107,6 +117,10 @@ export class Controller implements vscode.Disposable {
     );
     const on = (uri: vscode.Uri) => this.scheduleReload(path.basename(uri.fsPath) === 'feeds.json');
     this.storeWatcher = vscode.Disposable.from(w, w.onDidChange(on), w.onDidCreate(on), w.onDidDelete(on));
+  }
+
+  private isSourcesFile(uri: vscode.Uri): boolean {
+    return uri.scheme === 'file' && (uri.fsPath === this.store.globalFeedsPath || uri.fsPath.endsWith(PROJECT_FILE));
   }
 
   private pendingSourceReload = false;

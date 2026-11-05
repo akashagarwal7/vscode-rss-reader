@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import * as path from 'node:path';
@@ -70,9 +70,14 @@ export async function run(): Promise<void> {
 
     // Project feed via .vscode/rss-feeds.json is picked up by the watcher.
     const ws = process.env.TEST_WORKSPACE!;
-    mkdirSync(path.join(ws, '.vscode'), { recursive: true });
-    writeFileSync(path.join(ws, '.vscode', 'rss-feeds.json'), JSON.stringify({ feeds: [{ url: `${base}/project.xml` }] }));
-    await until(() => ctl.sources.some((s) => s.scope === 'project'), 'project source');
+    // Create it the way a user would: through the editor (watchers alone are unreliable on CI).
+    const projectUri = vscode.Uri.file(path.join(ws, '.vscode', 'rss-feeds.json'));
+    const edit = new vscode.WorkspaceEdit();
+    edit.createFile(projectUri, { ignoreIfExists: true });
+    edit.insert(projectUri, new vscode.Position(0, 0), JSON.stringify({ feeds: [{ url: `${base}/project.xml` }] }));
+    assert.ok(await vscode.workspace.applyEdit(edit), 'created project feeds file');
+    await (await vscode.workspace.openTextDocument(projectUri)).save();
+    await until(() => ctl.sources.some((s) => s.scope === 'project'), 'project source', 15000);
     await until(() => ctl.unreadCount(`${base}/project.xml`) === 1, 'project feed fetched', 10000);
     assert.equal(ctl.displayName(ctl.sources.find((s) => s.scope === 'project')!), 'Test Feed');
 
